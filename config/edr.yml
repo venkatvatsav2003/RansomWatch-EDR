@@ -1,0 +1,19 @@
+edr:
+  honeypot_dir: ./honeypot
+  alert_threshold: 7.5
+  warning_threshold: 6.5
+  poll_interval: 1.0
+  max_file_size: 104857600
+  excluded_extensions:
+    - .tmp
+    - .log
+    - .swp
+  excluded_patterns: []
+  alert_log: logs/alerts.json
+simulation:
+  benign_files: 3
+  encrypt_files: 2
+  encrypt_size_kb: 2048
+logging:
+  level: INFO
+  format: json
