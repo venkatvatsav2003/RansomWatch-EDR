@@ -1,89 +1,76 @@
 # RansomWatch EDR
 
 ![CI](https://github.com/venkatvatsav2003/RansomWatch-EDR/actions/workflows/ci.yml/badge.svg)
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
-![Language](https://img.shields.io/badge/language-Bash%20%2B%20Python-blue)
+![Version](https://img.shields.io/badge/version-3.0.0-blue)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 
-A behavioral ransomware detection engine that monitors file system entropy in real time. Instead of relying on signatures (which miss novel variants), RansomWatch detects the cryptographic behavior common to all ransomware: transforming low-entropy data into high-entropy encrypted output.
+**Behavioral ransomware detection via real-time file entropy monitoring.**
+
+## Install & Run
+
+```bash
+# One-liner
+pip install ransomwatch && ransomwatch monitor
+
+# Or clone and run
+git clone https://github.com/venkatvatsav2003/RansomWatch-EDR.git
+cd RansomWatch-EDR && pip install -r requirements.txt
+./edr.sh monitor                    # Start monitoring
+./edr.sh sim-attack                 # Simulate ransomware
+./edr.sh dashboard                  # View alerts
+
+# Docker
+docker-compose up edr               # Start monitoring
+docker-compose run --rm simulator   # Simulate attack
+```
 
 ## Features
 
-- **Behavioral Detection** — No signatures needed. Detects known and unknown ransomware
-- **Shannon Entropy Analysis** — Byte-level randomness measurement
-- **Real-Time Monitoring** — Polls file system for changes every second
-- **Attack Simulation Suite** — Built-in benign and ransomware simulators
-- **Alert Dashboard** — Review historical alerts from log
-- **JSON Alert Logging** — Structured logging for SIEM integration
-- **Configurable Thresholds** — Adjust sensitivity via YAML config
-- **File Signature Tracking** — Hex signature and size metadata in alerts
+- **Behavioral Detection** — no signatures needed, catches unknown variants
+- **Shannon Entropy** — byte-level randomness analysis
+- **Real-Time Monitoring** — 1-second polling interval
+- **Attack Simulator** — built-in benign and ransomware simulation
+- **Alert Dashboard** — structured JSON alerts with SIEM-ready format
+- **Webhook Alerts** — forward alerts to Slack, Teams, Discord, or custom endpoints
+- **Prometheus Metrics** — optional /metrics endpoint for observability
+- **Systemd Service** — production daemon mode
 
 ## Quick Start
 
 ```bash
-# Terminal 1: Start monitoring
+# Terminal 1: Start the monitor
 ./edr.sh monitor
 
 # Terminal 2: Simulate an attack
 ./edr.sh sim-attack
-./sim/attack.sh
 
-# View alerts
+# View dashboard
 ./edr.sh dashboard
 
-# Analyze a specific file
+# Analyze a single file
 ./edr.sh analyze suspicious.bin
-```
-
-## Architecture
-
-```
-┌─────────────────────────────────────┐
-│        edr.sh (Bash Orchestrator)    │
-│  - Command routing                    │
-│  - Simulation launcher               │
-│  - Dashboard viewer                  │
-└────────────┬────────────────────────┘
-             │
-    ┌────────┴────────┐
-    ▼                 ▼
-┌────────────┐  ┌──────────┐
-│ edr.py     │  │ sim/     │
-│ Monitor    │  │ attack   │
-│ Engine     │  │ .sh      │
-│            │  │ benign   │
-│ - Entropy  │  │ .sh      │
-│ - Tracking │  └──────────┘
-│ - Alerting │
-└────────────┘
 ```
 
 ## Detection Logic
 
-| Entropy Range | Classification | Action |
-|--------------|----------------|--------|
-| < 6.5 | Normal | Logged as OK |
-| 6.5 - 7.5 | Suspicious | Warning alert |
+| Entropy | Classification | Action |
+|---------|----------------|--------|
+| < 6.5 | Normal | Logged |
+| 6.5 - 7.5 | Suspicious | Warning |
 | > 7.5 | Ransomware | Critical alert |
 
 ## Project Structure
 
 ```
 RansomWatch-EDR/
-├── edr.py                # Python detection engine
-├── edr.sh                # Bash orchestrator
-├── config/edr.yml        # Detection config
-├── sim/
-│   ├── attack.sh         # Ransomware simulation
-│   └── benign.sh         # Normal file simulation
-├── tests/                # Pytest suite
-├── logs/                 # Alert output
-├── honeypot/             # Monitored directory
+├── edr.py                 # Python engine
+├── edr.sh                 # Bash launcher
+├── pyproject.toml         # pip install
+├── docker-compose.yml     # Docker one-command
+├── .env.example           # Config template
+├── config/edr.yml         # Detection config
+├── sim/attack.sh          # Attack simulation
+├── tests/
 ├── Dockerfile
-├── Makefile
-└── .github/workflows/
+└── Makefile
 ```
-
-## Dependencies
-
-- Python 3.8+ (with `pyyaml`)
-- Bash, `od`, `awk`, `bc` (standard Unix utilities)

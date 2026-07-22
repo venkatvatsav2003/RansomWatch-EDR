@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ransomwatch"
+version = "3.0.0"
+description = "Behavioral ransomware detection via real-time file entropy monitoring"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Venkat Vatsav"},
+]
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml>=6.0",
+]
+optional-dependencies = {
+    "dev": ["pytest>=7.4", "flake8>=6.1"],
+    "inotify": ["inotify>=0.2"],
+}
+
+[project.urls]
+homepage = "https://github.com/venkatvatsav2003/RansomWatch-EDR"
+
+[project.scripts]
+ransomwatch = "edr:main"
+
+[tool.setuptools]
+packages = ["ransomwatch"]
+package-dir = {"ransomwatch" = "."}

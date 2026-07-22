@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  edr:
+    build: .
+    volumes:
+      - ./honeypot:/edr/honeypot
+      - ./logs:/edr/logs
+      - ./config:/edr/config:ro
+    environment:
+      - EDR_THRESHOLD=7.5
+      - EDR_POLL_INTERVAL=1.0
+    restart: unless-stopped
+
+  simulator:
+    build: .
+    profiles:
+      - demo
+    volumes:
+      - ./honeypot:/edr/honeypot
+    environment:
+      - SIM_MODE=attack
+    command: sim-attack
