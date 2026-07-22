@@ -1,30 +1,53 @@
 # RansomWatch EDR
 
-A simple Python script to detect ransomware behavior by monitoring file entropy.
+A behavioral-based ransomware detector that monitors file entropy changes to identify encryption activity in real time.
 
-## How it works
-Ransomware encrypts files, which turns normal data into highly random data. This script watches a specific folder (`./honeypot`). Whenever a file is created or modified, it calculates the file's "Shannon Entropy". If the entropy is very high (close to 8.0), it triggers an alert indicating possible ransomware activity.
+## Ideology
+Ransomware leaves a detectable signature: it transforms structured, low-entropy data into high-entropy encrypted output. By monitoring file entropy (Shannon entropy), RansomWatch can detect ransomware behavior without relying on signatures — catching both known and novel variants.
 
-## Setup
+## How It Works
+1. Watches a designated folder (`./honeypot`)
+2. Detects file creation or modification via timestamp changes
+3. Computes Shannon entropy from byte frequency distribution
+4. Alerts if entropy exceeds 7.5 (near-maximum randomness)
 
-No external libraries are required! It uses pure Python.
+## Usage
 
-1. Run the monitor script in your terminal:
+**Terminal 1 — Start the monitor:**
 ```bash
-python ransomwatch.py
+chmod +x ransomwatch.sh attack.sh
+./ransomwatch.sh
 ```
 
-2. Open a second terminal and run the attack simulation to see it in action:
+**Terminal 2 — Simulate an attack:**
 ```bash
-python attack.py
+./attack.sh
 ```
 
-## Example Output
-```text
---- RansomWatch EDR Started ---
-Monitoring folder: ./honeypot
-[*] Detected change in normal_doc.txt (Entropy: 4.12)
-[*] Detected change in important_data.enc (Entropy: 7.95)
-🚨 ALERT! HIGH ENTROPY DETECTED!
-🚨 Possible Ransomware encryption on file: important_data.enc
+## Example
 ```
+RansomWatch EDR
+Monitoring: ./honeypot
+Entropy threshold: 7.5
+
+[OK] ./honeypot/normal_doc.txt (entropy: 4.12)
+[ALERT] ./honeypot/important_data.enc (entropy: 7.95)
+                   - Possible ransomware encryption!
+```
+
+## Architecture
+```
+filesystem changes
+    |
+    v
+[Timestamp Tracker] --> detect new/modified files
+    |
+    v
+[Entropy Engine] --> od + awk (byte frequency analysis)
+    |
+    v
+[Alert System] --> threshold comparison (>7.5)
+```
+
+## Dependencies
+`bash`, `od`, `awk`, `bc` (standard Unix utilities)
